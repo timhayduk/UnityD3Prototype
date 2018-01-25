@@ -7,13 +7,15 @@ using System.Linq;
 public class BarChart : MonoBehaviour {
 
     public Bar barPrefab;
-    public int[] inputValues;
+    public float[] inputValues;
     public string[] labels;
     public Color[] colors;
 
     List<Bar> bars = new List<Bar>();
 
     float chartHeight;
+
+    private CanvasManagerScript canvasManager;
 
 	// Use this for initialization
 	void Start () {
@@ -23,7 +25,12 @@ public class BarChart : MonoBehaviour {
         DisplayGraph(inputValues);
 	}
 
-    void DisplayGraph(int[] vals){
+    private void Awake()
+    {
+        canvasManager = transform.parent.GetComponent<CanvasManagerScript>();
+    }
+
+    void DisplayGraph(float[] vals){
         float maxValue = vals.Max() * 1.05f;
         for (int i = 0; i < vals.Length; i++){
             Bar newBar = Instantiate(barPrefab) as Bar;
@@ -46,5 +53,26 @@ public class BarChart : MonoBehaviour {
             }
         }
     }
-    
+
+    void ClearGraph()
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.name == "Bar Holder(Clone)")
+            {
+                Destroy(child.gameObject);
+            }
+        }
+    }
+
+    // Ask the canvas manager if there is any new data
+    private void Update()
+    {
+        if (canvasManager.dataChanged)
+        {
+            ClearGraph();
+            inputValues = canvasManager.values;
+            DisplayGraph(inputValues);
+        }
+    }
 }

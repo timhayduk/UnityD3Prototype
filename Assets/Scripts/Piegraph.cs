@@ -8,10 +8,17 @@ public class Piegraph : MonoBehaviour {
     public Color[] wedgeColors;
     public Image wedgePrefeb;
 
-	// Use this for initialization
-	void Start () {
+    private CanvasManagerScript canvasManager;
+
+    // Use this for initialization
+    void Start () {
         MakeGraph();
 	}
+
+    private void Awake()
+    {
+        canvasManager = transform.parent.GetComponent<CanvasManagerScript>();
+    }
 
     void MakeGraph(){
         float total = 0f;
@@ -30,8 +37,25 @@ public class Piegraph : MonoBehaviour {
         }
     }
 
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    void ClearGraph()
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.name == "Wedge(Clone)")
+            {
+                Destroy(child.gameObject);
+            }
+        }
+    }
+
+    // Ask the canvas manager if there is any new data
+    private void Update()
+    {
+        if (canvasManager.dataChanged)
+        {
+            ClearGraph();
+            values = canvasManager.values;
+            MakeGraph();
+        }
+    }
 }
